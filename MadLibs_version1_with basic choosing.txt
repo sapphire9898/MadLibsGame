@@ -1,0 +1,369 @@
+
+
+### # # # # # # # # # this test the start tool button. # # # # # # # # # # #
+############################################################################
+
+from processing import *
+
+
+
+mouseBtn = 0
+
+storyBtns = {}
+currStory = "first"
+
+class Button:
+    def __init__(self, words, x, y, w, wordx, wordy):
+        self.words = words
+        self.selected = False
+        self.inUse = False
+        self.x = x
+        self.y = y
+        self.width = w
+        self.height = 25
+        self.wordx = wordx
+        self.wordy = wordy
+        
+    def draw(self):
+        if self.selected:
+            stroke(255, 153, 0)
+            fill(255, 153, 0)
+            rect(self.x, self.y, self.width, self.height)
+            stroke(0, 0, 0)
+            fill(0, 0, 0)
+        else:
+            stroke(0, 0, 0)
+            fill(0, 0, 0)
+            rect(self.x, self.y, self.width, self.height)
+            stroke(255, 255, 255)
+            fill(255, 255, 255)
+        textSize(20)
+        text(self.words, self.wordx, self.wordy)
+        
+    def toggle(self):
+        if self.selected:
+            self.selected = False
+        else:
+            self.selected = True
+            
+    def checkSelected(self, mouseX, mouseY):
+        if mouseX >= self.x and mouseX <= self.x + self.width:
+            if mouseY >= self.y and mouseY <= self.y + self.height:
+                return True
+            else:
+                return False
+        else:
+            return False
+        
+
+def setup():
+    global storyButton, storyBtns
+    size(550, 500)
+    background(255, 255, 255)
+    storyButton = Button("Start", 320, 10, 70, 330, 30)
+    
+    firstBtn = Button("First Story", 110, 110, 60, 115, 130)
+    firstBtn.toggle()    
+    storyBtns["first"] = firstBtn
+    
+    secondBtn = Button("Second Story", 110, 250, 70, 115, 270)
+    storyBtns["second"] = secondBtn
+    
+    doneBtn = Button("Done", 240, 290, 70, 250, 310)
+    storyBtns["done"] = doneBtn
+    
+    
+    
+    
+def draw():
+    background(255,255,255)
+    x = 5
+    y = 10
+    currX = mouse.x
+    currY = mouse.y
+    
+    #tools button
+    storyButton.draw()
+    
+    if storyButton.selected:
+        drawStories()
+    
+def mousePressed():
+    currX = mouse.x
+    currY = mouse.y
+    if mouse.button == 37:
+        if currY >= 10 and currY <= 35 and currX >= 320 and currX <= 390:
+            storyButton.toggle()
+        else:
+            mouseBtn = 37
+            if storyBtns["first"].checkSelected(currX, currY):
+                    currStory = "first"
+                    storyBtns["first"].toggle()
+                    storyBtns["second"].toggle()
+            elif storyBtns["second"].checkSelected(currX, currY):
+                    currTool = "second"
+                    storyBtns["first"].toggle()
+                    storyBtns["second"].toggle()
+    
+            if storyBtns["done"].checkSelected(currX, currY):
+                    storyButton.toggle()
+                      
+    
+def drawStories():
+    fill(0, 204, 255)
+    rect(100, 100, 350, 250)
+    
+    for button in storyBtns:
+        storyBtns[button].draw()
+        
+run()
+
+
+
+
+
+##################################################################
+## This piece of code test one mad lib game. ######################
+###################################################################
+
+from processing import *
+
+list = ["", ""];#the number of the words should be recorded. 
+currentPosition = 0;
+
+def setup():
+    size(500, 400)
+
+def draw():
+    
+    background(0, 0, 0)
+    textSize(20)
+    if (currentPosition <= len(list)) :
+        text("please input noun : ", 20, 50)
+        text(list[0], 200, 50)
+    
+        text("please input adjective : ", 20, 100)
+        text(list[1], 230, 100)
+    
+    if (currentPosition == len(list)):
+        text(list[0] + " are " + list[1], 340, 150)
+    
+    
+    
+def keyPressed():
+    global word1, word2, currentPosition
+    if keyboard.key >= 'a' and keyboard.key <= 'z':
+        list[currentPosition] += keyboard.key
+        
+    elif keyboard.keyCode == BACKSPACE :
+        list[currentPosition] = list[currentPosition][:-1];
+    elif keyboard.keyCode == ENTER :
+        currentPosition = currentPosition + 1;
+        
+run()
+
+
+
+
+############################################################
+from processing import *
+
+
+
+currentPosition = 0
+currentStory = 1
+word = ""
+
+
+firstList = [["input the noun(plural): ", "input the adjective: "],
+        ["are"], 
+        ["", ""]]
+secondList = [["input the name: ", "input the adjective: ", "input the noun: "], 
+             ["Please excuse ", "who is far too ", "to attend ", "class."],
+             ["", "", ""]]
+thirdList = [["input the name: ", "input the part of the body: ", 
+              "input the type of fluid", "input a substance: "],
+            ["is sick with the ", "flu. Drink more ", "and take ", "as needed."],
+            ["", "", "", ""]]
+fourthList = [[],
+             [],
+             []]
+
+
+class Story:
+    def __init__(self, list_hint, list_original, list_replace, currentPosition, word):
+        self.list_hint = list_hint
+        self.list_original = list_original
+        self.list_replace = list_replace
+        self.currentPosition = currentPosition
+        self.word = word
+        
+    def draw(self):
+        for x in range(len(self.list_hint)):
+            textSize(20)
+            text(self.list_hint[x], 10, 30 * (x + 1))
+    
+    def composite(self):
+        if len(self.list_original) == len(self.list_replace) + 1:
+            for x in range(0, len(self.list_replace)) :
+                self.word = self.word + " " + self.list_original[x] + " " + self.list_replace[x] + '\n'
+            self.word = self.word + self.list_original[len(self.list_original) - 1]
+        else:
+            for x in range(0, len(self.list_original)) :
+                self.word = self.word + " " + self.list_replace[x] + " " + self.list_original[x] + '\n'
+            self.word = self.word + " " + self.list_replace[len(self.list_replace) - 1]
+              
+            
+def setup():
+    global firstStory, currentStory, word, list
+    size(500, 400)
+    list = firstList
+    firstStory = Story(list[0], list[1], list[2], 0, "")
+    currentPosition = firstStory.currentPosition
+
+def draw():
+    
+    background(0, 0, 0)
+    textSize(20)
+    firstStory.draw();
+    
+    if (currentPosition <= len(firstStory.list_hint)) :
+        for x in range(0, len(firstStory.list_hint)) :
+            text(list[2][x], 180, 30 * (x + 1))
+            
+        
+    
+    if (currentPosition == len(firstStory.list_hint)):
+        firstStory.composite()
+        text("The paragraph is : ", 10, 30 * len(firstStory.list_hint) + 30)
+        text(firstStory.word, 20, 30 * len(firstStory.list_hint) + 60)
+        exitp()
+        
+
+def keyPressed():
+    
+    global currentPosition
+    if keyboard.key >= 'a' and keyboard.key <= 'z':
+        list[2][currentPosition] += keyboard.key
+        
+    elif keyboard.keyCode == BACKSPACE :
+        list[2][currentPosition] = list[2][currentPosition][:-1];
+    elif keyboard.keyCode == ENTER :
+        currentPosition = currentPosition + 1;
+        
+    
+    
+run()
+
+
+###################################################
+
+## add five stories, 
+## process the problem that they are equal, or one difference. 
+## need to add the tools to choose the one story. 
+
+
+from processing import *
+
+
+
+currentPosition = 0
+currentStory = 1
+word = ""
+
+
+firstList = [["input the noun(plural): ", "input the adjective: "],
+        ["are"], 
+        ["", ""]]
+secondList = [["input the name: ", "input the adjective: ", "input the noun: "], 
+             ["Please excuse ", "who is far too ", "to attend ", "class."],
+             ["", "", ""]]
+thirdList = [["input the name: ", "input the part of the body: ", 
+              "input the type of fluid", "input a substance: "],
+            ["is sick with the ", "flu. Drink more ", "and take ", "as needed."],
+            ["", "", "", ""]]
+fourthList = [["input the name: ", "input the place: ", "input the noun: "],
+             ["is authorized to be at", "instead of ", "class"],
+             ["", "", ""]]
+
+fifthList = [["input the name: ", "input the noun: ", "input the event: "],
+            ["is too cool for", "class. \n Instead, she/he will be \n attending the"],
+            ["", "", ""]]
+
+
+class Story:
+    def __init__(self, list_hint, list_original, list_replace, currentPosition, word, before):
+        self.list_hint = list_hint
+        self.list_original = list_original
+        self.list_replace = list_replace
+        self.currentPosition = currentPosition
+        self.word = word
+        self.replaceBefore = before
+        
+    def draw(self):
+        for x in range(len(self.list_hint)):
+            textSize(20)
+            text(self.list_hint[x], 10, 30 * (x + 1))
+    
+    def composite(self):
+        if len(self.list_original) == len(self.list_replace) + 1:
+            for x in range(0, len(self.list_replace)) :
+                self.word = self.word + " " + self.list_original[x] + " " + self.list_replace[x] + '\n'
+            self.word = self.word + self.list_original[len(self.list_original) - 1]
+        elif len(self.list_original) == len(self.list_replace) - 1:
+            for x in range(0, len(self.list_original)) :
+                self.word = self.word + " " + self.list_replace[x] + " " + self.list_original[x] + '\n'
+            self.word = self.word + " " + self.list_replace[len(self.list_replace) - 1]
+        else :
+            if self.replaceBefore :
+                for x in range(0, len(self.list_original)) :
+                    self.word = self.word + " " + self.list_replace[x] + " " + self.list_original[x] + '\n'
+            else :
+                for x in range(0, len(self.list_original)) :
+                    self.word = self.word + " " + self.list_original[x] + " " + self.list_replace[x] + '\n'
+                
+            
+def setup():
+    global  currentStory, word, list
+    size(500, 400)
+    list = fifthList
+    currentStory = Story(list[0], list[1], list[2], 0, "", True)
+    currentPosition = currentStory.currentPosition
+
+def draw():
+    
+    background(0, 0, 0)
+    textSize(20)
+    currentStory.draw();
+    
+    if (currentPosition <= len(currentStory.list_hint)) :
+        for x in range(0, len(currentStory.list_hint)) :
+            text(list[2][x], 180, 30 * (x + 1))
+            
+    
+    if (currentPosition == len(currentStory.list_hint)):
+        currentStory.composite()
+        
+        text("The paragraph is : ", 10, 150)
+        text(currentStory.word, 20, 180)
+        exitp()
+        
+
+def keyPressed():
+    
+    global currentPosition
+    if keyboard.key >= 'a' and keyboard.key <= 'z':
+        list[2][currentPosition] += keyboard.key
+        
+    elif keyboard.keyCode == BACKSPACE :
+        list[2][currentPosition] = list[2][currentPosition][:-1];
+    elif keyboard.keyCode == ENTER :
+        currentPosition = currentPosition + 1;
+        
+    
+    
+run()
+
+
+
+
